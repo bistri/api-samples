@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .container{
+            margin-top: 50px;
+            width: 400px;
+        }
+
+        .pane {
+            margin: 20px;
+            text-align: center;
+        }
+
+        video {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="pane" id="pane_0">
+            <img src="http://static.tumblr.com/uzwqx7a/8VIm8jofz/logo.png">
+        </div>
+        <div class="pane" id="pane_1" style="display: none">
+            <input type="button" value="Call Jane Smith (bistri_user_002)" id="call" class="btn btn-info btn-default btn-block">
+        </div>
+        <div class="pane" id="pane_2" style="display: none">
+            <div id="video_container"></div>
+            <input type="button" value="Stop Call" id="quit" class="btn btn-danger btn-default btn-block">
+        </div>
+    </div>
+    <script>
+        var userId = "bistri_user_001";
+        var userName = "John Smith";
+        var remoteUserId = "bistri_user_002";
+    </script>
+    <script type="text/javascript" src="conference.js"></script>
+    <script type="text/javascript" src="https://api.bistri.com/bistri.conference.min.js"></script>
+</body>
+</html>
