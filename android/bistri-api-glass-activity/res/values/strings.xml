@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="api_room_title">Room name</string>
+    <string name="api_room_key">room_key</string>
+    <string name="api_room_value">conference-room</string>
+
+    <string name="app_name">Bistri API demo Glass</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="call">Call</string>
+    <string name="hang_up">Hang up</string>
+    <string name="front_camera">Front</string>
+    <string name="back_camera">Back</string>
+
+    <string name="voice_chat_invite">Voice Chat Invite</string>
+    <string name="accept_call">Accept</string>
+    <string name="decline_call">Decline</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="connecting">Connecting...</string>
+    <string name="connected">Connected</string>
+    <string name="no_network">No network</string>
+
+    <string name="create_input_error">Please enter a room name</string>
+
+    <string name="welcome_msg">Welcome</string>
+    <string name="create">Create</string>
+
+    <string name="close">Close</string>
+    <string name="settings">Settings</string>
+
+
+    <string name="join_room">Join room</string>
+    <string name="room_name">Enter room name</string>
+
+    <!--
+    <string name="menu_settings">Parameters</string>
+    -->
+</resources>

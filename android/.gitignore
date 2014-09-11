@@ -1,0 +1,14 @@
+**/target
+bistri-api-demo/jni
+bistri-api-demo/libs
+bistri-api-demo/gen-external-apklibs
+bistri-api-demo/obj
+bistri-api-demo/src/main/java/com/bistri/api
+bistri-api-demo/src/main/java/org
+bistri-api-glass-activity/jni
+bistri-api-glass-activity/libs
+bistri-api-glass-activity/gen-external-apklibs
+bistri-api-glass-activity/obj
+bistri-api-glass-activity/src/main/java/com/bistri/api
+bistri-api-glass-activity/src/main/java/org
+

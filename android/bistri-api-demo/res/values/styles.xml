@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Bistri.TextView.Large" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">@dimen/textSize_large</item>
+        <item name="android:textColor">@color/blue</item>
+    </style>
+
+    <style name="Bistri.TextView" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">@dimen/textSize</item>
+        <item name="android:textColor">@color/blue</item>
+    </style>
+
+    <style name="Bistri.EditText" parent="@android:style/Widget.EditText">
+        <item name="android:textSize">@dimen/textSize</item>
+        <item name="android:textColorHint">@color/edittext_text_hint</item>
+        <item name="android:textColor">@color/edittext_text</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Bistri.Button" parent="@android:style/Widget.Button">
+        <item name="android:textSize">@dimen/textSize</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/button_blue</item>
+    </style>
+
+    <style name="Bistri" parent="@android:style/Theme.Holo">
+        <item name="android:textViewStyle">@style/Bistri.TextView</item>
+        <item name="android:editTextStyle">@style/Bistri.EditText</item>
+        <item name="android:buttonStyle">@style/Bistri.Button</item>
+    </style>
+
+</resources>

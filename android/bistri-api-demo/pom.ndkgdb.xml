@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.bistri.api</groupId>
+  <artifactId>bistri-api-demo</artifactId>
+  <version>1.0</version>
+  <packaging>apk</packaging>
+
+  <name>Bistri android WebRTC - API demo</name>
+  <dependencies>
+    <dependency>
+      <groupId>android</groupId>
+      <artifactId>android</artifactId>
+<!--
+      <version>4.4W_r1</version>
+-->
+      <version>4.4.2_r3</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+        <artifactId>android-maven-plugin</artifactId>
+        <version>3.8.2</version>
+        <extensions>true</extensions>
+        <configuration>
+          <attachNativeArtifacts>true</attachNativeArtifacts>
+          <sdk>
+            <platform>19</platform>
+          </sdk>
+	<apkDebug>true</apkDebug>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
