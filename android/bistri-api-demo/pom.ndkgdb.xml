@@ -5,7 +5,7 @@
 
   <groupId>com.bistri.api</groupId>
   <artifactId>bistri-api-demo</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
   <packaging>apk</packaging>
 
   <name>Bistri android WebRTC - API demo</name>
@@ -21,7 +21,28 @@
     </dependency>
   </dependencies>
   <build>
+      <resources>
+          <resource>
+              <directory>../bistri-api/src/main/resources/java</directory>
+              <includes>
+                  <include>**/*.java</include>
+              </includes>
+              <targetPath>${project.build.directory}/generated-sources/r/com/bistri/api</targetPath>
+              <filtering>true</filtering>
+          </resource>
+      </resources>
     <plugins>
+      <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <executions>
+              <execution>
+                  <phase>initialize</phase>
+                  <goals>
+                      <goal>resources</goal>
+                  </goals>
+              </execution>
+          </executions>
+      </plugin>
       <plugin>
         <groupId>com.jayway.maven.plugins.android.generation2</groupId>
         <artifactId>android-maven-plugin</artifactId>

@@ -76,7 +76,6 @@ public class MediaStreamLayout extends RelativeLayout implements View.OnClickLis
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        Log.w( TAG, "onLayout" );
         super.onLayout( changed, left, top, right, bottom );
 
         resizeAllVideo();

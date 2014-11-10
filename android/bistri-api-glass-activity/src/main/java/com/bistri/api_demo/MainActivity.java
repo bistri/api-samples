@@ -17,11 +17,13 @@ import android.widget.Toast;
 
 import com.bistri.api.Conference;
 import com.bistri.api.Conference.*;
+import com.bistri.api.DataStream;
 import com.bistri.api.MediaStream;
 import com.bistri.api.PeerStream;
 import com.bistri.api_demo.utils.NetworkConnectivityReceiver;
 
 import java.lang.Override;
+import java.util.ArrayList;
 
 public class MainActivity
         extends Activity
@@ -83,7 +85,7 @@ public class MainActivity
         networkConnectivityReceiver.setListener( this );
 
         // Force
-        statusUpdate( conference.getStatus() );
+        statusUpdate(conference.getStatus());
     }
 
     private void statusUpdate(Conference.Status conf_status) {
@@ -98,7 +100,7 @@ public class MainActivity
                                         conf_status== Conference.Status.DISCONNECTED?"DISCONNECTED":
                                                 "<unknown>"
         ) + " network==" + network;
-        Log.d(TAG, str );
+        Log.d(TAG, str);
 
 
         String status_str = getString(
@@ -106,7 +108,7 @@ public class MainActivity
                         ( (conf_status == Conference.Status.CONNECTING || conf_status == Conference.Status.CONNECTING_SENDREQUEST) && network ) ? R.string.connecting :
                                 ( !network ) ? R.string.no_network : R.string.disconnected
         );
-        Log.d(TAG, "new status : " +status_str);
+        Log.d(TAG, "new status : " + status_str);
 
         status.setText(status_str);
 
@@ -164,7 +166,7 @@ public class MainActivity
     }
 
     @Override
-    public void onRoomQuitted() {
+    public void onRoomQuitted(String room_name) {
 
     }
 
@@ -179,6 +181,10 @@ public class MainActivity
 
     @Override
     public void onMediaStream(String peerId, MediaStream mediaStream) {
+    }
+
+    @Override
+    public void onDataStream(String peer_id, DataStream dataStream) {
     }
 
     @Override
@@ -239,5 +245,15 @@ public class MainActivity
     @Override
     public void onPresence( String peerId, Presence presence ) {
 
+    }
+
+    @Override
+    public void onIncomingRequest(String peerId, String peerName, String room, String event) {
+
+    }
+
+    @Override
+    public void onRoomMembers(String roomName, ArrayList<Member> members) {
+        
     }
 }

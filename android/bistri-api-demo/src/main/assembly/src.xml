@@ -18,6 +18,10 @@
       <source>README.md</source>
       <outputDirectory>/</outputDirectory>
     </file>
+    <file>
+      <source>README_ADT.txt</source>
+      <outputDirectory>/</outputDirectory>
+    </file>
   </files>
   <fileSets>
     <fileSet>

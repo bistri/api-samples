@@ -1,4 +1,5 @@
 **/target
+**/*.iml
 bistri-api-demo/jni
 bistri-api-demo/libs
 bistri-api-demo/gen-external-apklibs

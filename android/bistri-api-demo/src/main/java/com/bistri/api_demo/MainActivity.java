@@ -29,9 +29,11 @@ import android.widget.Toast;
 
 import com.bistri.api.Conference;
 import com.bistri.api.Conference.*;
+import com.bistri.api.DataStream;
 import com.bistri.api.MediaStream;
 import com.bistri.api.PeerStream;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 
@@ -299,16 +301,18 @@ public class MainActivity extends Activity
     @Override
     public void onRoomJoined(String room_name) {
         setInCall( true );
+conference.getMembers( room_name );
     }
 
     @Override
-    public void onRoomQuitted() {
+    public void onRoomQuitted(String room_name) {
         setInCall( false );
     }
 
     @Override
     public void onNewPeer( PeerStream peerStream ) {
         peerStream.setHandler( this );
+        if ( !peerStream.isLocal() ) peerStream.openDataChannel( "TEST" );
     }
 
     @Override
@@ -326,7 +330,54 @@ public class MainActivity extends Activity
     }
 
     @Override
+    public void onDataStream(String peer_id, DataStream dataStream) {
+
+    Log.d( TAG, "onDataStream peer_id:" + peer_id + " label:" + dataStream.getLabel() );
+    dataStream.setHandler( new DataStream.Handler() {
+        @Override
+        public void onOpen(DataStream myself) {
+            Log.d( TAG+" DataStream.Handler", "onOpen" );
+        }
+
+        @Override
+        public void onMessage(DataStream myself, ByteBuffer message, boolean binary) {
+            Log.d( TAG+" DataStream.Handler", "onMessage length:" + message.capacity() );
+            // Testing : Do an echo for text message
+            if ( !binary ) {
+                byte[] b = new byte[message.remaining()];
+                message.get(b);
+
+                myself.send( "(android echo) " +  new String(b));
+            }
+        }
+
+        @Override
+        public void onClose(DataStream myself) {
+    Log.d( TAG+" DataStream.Handler", "onClose" );
+        }
+
+        @Override
+        public void onError(DataStream myself, String error) {
+    Log.d( TAG+" DataStream.Handler", "onError : " + error );
+        }
+    });
+    }
+
+    @Override
     public void onPresence(String peerId, Presence presence) {}
+
+    @Override
+    public void onIncomingRequest(String peerId, String peerName, String room, String event) {
+        Log.v( TAG, "peerId:" + peerId + " peerName:" + peerName + " room:" + room + " event:" + event );
+    }
+
+    @Override
+    public void onRoomMembers(String roomName, ArrayList<Member> members) {
+for (int i = 0; i < members.size(); i++) {
+    Member member =  members.get(i);
+    Log.v( TAG, "member id:" + member.id() + " name:" + member.name() );
+}
+    }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig)
