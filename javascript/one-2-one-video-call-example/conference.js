@@ -111,14 +111,14 @@ onBistriConferenceReady = function () {
 		if( confirm( request.name + " is inviting you to join his conference room. Click \"Ok\" to start the call." ) ){
 			// invitation has been accepted
 			// ask the user to access to his webcam and set the resolution to 640x480
-			 bc.startStream( "640x480", function( localStream ){
+			 bc.startStream( "640x480", function( stream ){
 				// when webcam access has been granted
 				// show pane with id "pane_2"
 				showPanel( "pane_2" );
 				// set "localStream" variable with the local stream
 				localStream = stream;
 				// insert the local webcam stream into the page body, mirror option invert the display
-				bc.attachStream( localStream, q( "#video_container" ), { mirror: true } );
+				bc.attachStream( stream, q( "#video_container" ), { mirror: true } );
 			   // then join the room specified in the "request" object
 				bc.joinRoom( request.room );
 			} );
