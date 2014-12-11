@@ -7,7 +7,7 @@ var dataChannels = {};
 onBistriConferenceReady = function () {
 
     // test if the browser is WebRTC compatible
-    if ( !BistriConference.isCompatible() ) {
+    if ( !bc.isCompatible() ) {
         // if the browser is not compatible, display an alert
         alert( "your browser is not WebRTC compatible !" );
         // then stop the script execution
@@ -17,19 +17,19 @@ onBistriConferenceReady = function () {
     /* Set events handler */
 
     // when local user is connected to the server
-    BistriConference.signaling.addHandler( "onConnected", function () {
+    bc.signaling.bind( "onConnected", function () {
         // show pane with id "pane_1"
         showPanel( "pane_1" );
     } );
 
     // when an error occured on the server side
-    BistriConference.signaling.addHandler( "onError", function () {
+    bc.signaling.bind( "onError", function () {
         // display an alert message
         alert( error.text + " (" + error.code + ")" );
     } );
 
     // when the user has joined a room
-    BistriConference.signaling.addHandler( "onJoinedRoom", function ( data ) {
+    bc.signaling.bind( "onJoinedRoom", function ( data ) {
         // set the current room name
         room = data.room;
         // show pane with id "pane_2"
@@ -39,41 +39,41 @@ onBistriConferenceReady = function () {
             // set a couple id/nickname to "users" object
             users[ data.members[ i ].id ] = data.members[ i ].name;
             // ... open a data channel
-            BistriConference.openDataChannel( data.members[ i ].id, "chat", data.room );
+            bc.openDataChannel( data.members[ i ].id, "chat", data.room );
         }
     } );
 
     // when an error occurred while trying to join a room
-    BistriConference.signaling.addHandler( "onJoinRoomError", function ( error ) {
+    bc.signaling.bind( "onJoinRoomError", function ( error ) {
         // display an alert message
         alert( error.text + " (" + error.code + ")" );
     } );
 
     // when the local user has quitted the room
-    BistriConference.signaling.addHandler( "onQuittedRoom", function( room ) {
+    bc.signaling.bind( "onQuittedRoom", function( room ) {
         // show pane with id "pane_1"
         showPanel( "pane_1" );
         // stop the local stream
-        BistriConference.stopStream();
+        bc.stopStream();
     } );
 
     // when a remote user has joined a room in which the local user is in
-    BistriConference.signaling.addHandler( "onPeerJoinedRoom", function ( peer ) {
+    bc.signaling.bind( "onPeerJoinedRoom", function ( peer ) {
         // set a couple id/nickname to "users" object
         users[ peer.pid ] = peer.name;
     } );
 
     // when a remote user has quitted a room in which the local user is in
-    BistriConference.signaling.addHandler( "onPeerQuittedRoom", function ( peer ) {
+    bc.signaling.bind( "onPeerQuittedRoom", function ( peer ) {
         // delete couple id/nickname in "users" object
         delete users[ peer.pid ];
     } );
 
     // when the local user has created a data channel, invoke "onDataChannel" callback
-    BistriConference.channels.addHandler( "onDataChannelCreated", onDataChannel );
+    bc.channels.bind( "onDataChannelCreated", onDataChannel );
 
     // when the remote user has created a data channel, invoke "onDataChannel" callback
-    BistriConference.channels.addHandler( "onDataChannelRequested", onDataChannel );
+    bc.channels.bind( "onDataChannelRequested", onDataChannel );
 
     // bind function "setNickname" to button "Set Nickname"
     q( "#nick" ).addEventListener( "click", setNickname );
@@ -125,14 +125,14 @@ function setNickname(){
         // initialize API client with application keys and nickname
         // if you don't have your own, you can get them at:
         // https://api.developers.bistri.com/login
-        BistriConference.init( {
+        bc.init( {
             appId: "38077edb",
             appKey: "4f304359baa6d0fd1f9106aaeb116f33",
             userName: nickname,
             debug: true
         } );
         // open a new session on the server
-        BistriConference.connect();
+        bc.connect();
     }
     else{
         // otherwise, display an alert
@@ -147,7 +147,7 @@ function joinChatRoom(){
     // if a chat room name has been set ...
     if( roomToJoin ){
         // ... join the room
-        BistriConference.joinRoom( roomToJoin );
+        bc.joinRoom( roomToJoin );
     }
     else{
         // otherwise, display an alert
@@ -163,7 +163,7 @@ function quitChatRoom(){
         dataChannels[ id ].close();
     }
     // and quit chat room
-    BistriConference.quitRoom( room );
+    bc.quitRoom( room );
 }
 
 // when button "Send Message" has been clicked
