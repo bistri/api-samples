@@ -17,7 +17,7 @@ In **linked Frameworks and libraries**, click on **"+"** and add *libbistriapi.a
 
 - In the same part, use the search field to add *libstdc++.dylib* and *libsqlite3.dylib*
 
-- Now go on **build settings** and in **Search Paths** categories, add the lib full path *$PATH/bistri-ios-sdk-VERSION*
+- Now go on **build settings** and in **Search Paths** categories, add the project full path *$PATH/bistri-ios-sdk-VERSION*
 
 - In project navigator, add a new group and modify the path of this folder to match the **sdk/bistri** folder by clicking on the folder icon into **Utilities** panel.
 
