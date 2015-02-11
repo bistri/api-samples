@@ -3,7 +3,7 @@ Demonstration
 
 Pre-requisites
 --------------
-- Visit the page http://developers.bistri.com/webrtc-sdk/#iOS-sdk and get the latest iOS sdk or download it directly [here](bit.ly/bistri_ios_1_0-beta-1)
+- Visit the page http://developers.bistri.com/webrtc-sdk/#iOS-sdk and get the latest iOS sdk or download it directly [here](http://bit.ly/bistri_ios_1_0-beta-1)
 
 - Into *bistri-ios-VERSION.tar.gz*, you have 3 folders: **doc**, **demo** and **sdk** wich contains all necessary files.
 
