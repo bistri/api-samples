@@ -9,12 +9,12 @@ ECLIPSE ADT HOWTO
 3 - Uncompress bistri-api tar.gz and go into extracted folder like this
 
 mkdir bistri-api
-tar -zxf bistri-api-archive-1.1.tar.gz -C bistri-api
+tar -zxf bistri-api-archive-1.1.1.tar.gz -C bistri-api
 cd bistri-api
 
 4 - Eclipse needs the content of the aar file, so uncompress it.
 
-unzip sdk/bistri-api-1.1.aar -d aar
+unzip sdk/bistri-api-1.1.1.aar -d aar
 
 5 - Copy bistri libraries (java and native)
 

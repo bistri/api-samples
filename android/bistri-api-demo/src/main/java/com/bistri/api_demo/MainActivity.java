@@ -84,7 +84,7 @@ public class MainActivity extends Activity
 
         // Conference
         conference = Conference.getInstance( getApplicationContext() );
-        conference.setInfo( "38077edb", "4f304359baa6d0fd1f9106aaeb116f33" );
+        conference.setInfo( "38077edb", "4f304359baa6d0fd1f9106aaeb116f33", "AndroidUser" );
 
         conference.setVideoOption( VideoOption.MAX_WIDTH, 320 );
         conference.setVideoOption( VideoOption.MAX_HEIGHT, 240 );
