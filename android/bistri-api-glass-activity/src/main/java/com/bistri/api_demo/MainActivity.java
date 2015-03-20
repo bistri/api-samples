@@ -38,6 +38,7 @@ public class MainActivity
     private TextView status;
     private SharedPreferences settings;
     private RelativeLayout call_layout;
+    private boolean in_call;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,7 @@ public class MainActivity
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         status = (TextView)findViewById( R.id.status );
         call_layout = (RelativeLayout)findViewById( R.id.call_layout );
+	in_call = false;
 
         init();
     }
@@ -56,8 +58,8 @@ public class MainActivity
         networkConnectivityReceiver.setListener(null);
         conference.removeListener(this);
 
-        if ( conference.isInRoom() ) {
-            conference.leave();
+        if ( in_call ) {
+            conference.leave( room_name );
         }
         if ( conference.getStatus() == Conference.Status.CONNECTED ) {
             conference.disconnect();
@@ -120,7 +122,7 @@ public class MainActivity
                     conference.connect();
                     break;
                 case CONNECTED:
-                    if (!conference.isInRoom()) {
+                    if ( in_call ) {
                         conference.join(room_name);
                     }
                     break;
@@ -162,12 +164,12 @@ public class MainActivity
 
     @Override
     public void onRoomJoined(String room_name) {
-
+	in_call = true;
     }
 
     @Override
     public void onRoomQuitted(String room_name) {
-
+	in_call =false;
     }
 
     @Override
@@ -213,8 +215,8 @@ public class MainActivity
                 finish();
                 return true;
             case R.id.settings:
-                if ( conference.isInRoom() ) {
-                    conference.leave();
+                if ( in_call ) {
+                    conference.leave( room_name );
                 }
 
                 Intent i = new Intent( this, Settings.class );

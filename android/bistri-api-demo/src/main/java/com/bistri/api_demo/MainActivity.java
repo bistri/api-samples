@@ -1,6 +1,5 @@
 package com.bistri.api_demo;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -44,7 +43,8 @@ public class MainActivity extends Activity
     private static final String DEFAULT_ROOM_NAME = "androidroom";
 
     // Members
-    private EditText room_name;
+    private EditText room_edit;
+    private String  room_name;
     private Button join_button;
     private TextView status;
     private ImageView loader_spinner;
@@ -52,6 +52,7 @@ public class MainActivity extends Activity
     private LinearLayout room_layout;
     private boolean orientation_landscape;
     private Spinner select_camera;
+    private boolean in_call;
 
     private Conference conference;
 
@@ -67,12 +68,13 @@ public class MainActivity extends Activity
         setContentView(R.layout.demo);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        room_name = ( EditText )findViewById( R.id.room_name );
+        in_call = false;
+        room_edit = ( EditText )findViewById( R.id.room_name );
         join_button = ( Button )findViewById( R.id.join_button );
         status = ( TextView )findViewById( R.id.status );
         loader_spinner = ( ImageView )findViewById( R.id.loader_spinner );
         call_layout = ( MediaStreamLayout )findViewById( R.id.call_layout );
-        room_name.setText( DEFAULT_ROOM_NAME );
+        room_edit.setText(DEFAULT_ROOM_NAME);
         room_layout = ( LinearLayout )findViewById( R.id.room_layout );
         orientation_landscape = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
         if ( orientation_landscape ) {
@@ -84,7 +86,7 @@ public class MainActivity extends Activity
 
         // Conference
         conference = Conference.getInstance( getApplicationContext() );
-        conference.setInfo( "38077edb", "4f304359baa6d0fd1f9106aaeb116f33", "AndroidUser" );
+        conference.setInfo( "38077edb", "4f304359baa6d0fd1f9106aaeb116f33" );
 
         conference.setVideoOption( VideoOption.MAX_WIDTH, 320 );
         conference.setVideoOption( VideoOption.MAX_HEIGHT, 240 );
@@ -92,6 +94,7 @@ public class MainActivity extends Activity
 
         conference.setAudioOption( AudioOption.PREFERRED_CODEC, AudioCodec.ISAC );
         conference.setAudioOption( AudioOption.PREFERRED_CODEC_CLOCKRATE, 16000 );
+        conference.setLoudspeaker( false );
         init();
     }
 
@@ -107,9 +110,9 @@ public class MainActivity extends Activity
                 return null;
             }
         };
-        room_name.setFilters(new InputFilter[]{filter});
+        room_edit.setFilters(new InputFilter[]{filter});
         // Set keyboard action
-        room_name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        room_edit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEND) {
                     join_button.performClick();
@@ -189,7 +192,7 @@ public class MainActivity extends Activity
         super.onResume();
 
         conference = Conference.getInstance( getApplicationContext() );
-        
+
         conference.addListener( this );
 
         onConnectionEvent(conference.getStatus());
@@ -227,7 +230,7 @@ public class MainActivity extends Activity
         boolean showLoader = ( state == Status.CONNECTING ) || ( state == Status.CONNECTING_SENDREQUEST );
         showLoaderSpinner( showLoader );
 
-        room_name.setEnabled( state == Status.CONNECTED );
+        room_edit.setEnabled(state == Status.CONNECTED);
         join_button.setEnabled(state == Status.CONNECTED);
     }
 
@@ -239,14 +242,15 @@ public class MainActivity extends Activity
         } else {
             call_layout.removeAllMediaStream();
         }
+        in_call = inCall;
     }
 
     @Override
     public void onBackPressed() {
         Log.w(TAG, "onBackPressed");
 
-        if ( conference.isInRoom() ) {
-            conference.leave();
+        if ( in_call ) {
+            conference.leave( room_name );
             return;
         }
         super.onBackPressed();
@@ -260,15 +264,15 @@ public class MainActivity extends Activity
         switch( view.getId() ) {
             case R.id.join_button:
 
-                String roomName = room_name.getText().toString();
+                room_name = room_edit.getText().toString();
 
-                if ( roomName == null || roomName.length() == 0 ) {
+                if ( room_name == null || room_name.length() == 0 ) {
                     Toast.makeText(this, R.string.create_input_error, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if ( conference.getStatus() == Status.CONNECTED ) {
-                    conference.join( roomName );
+                    conference.join( room_name );
                     setInCall( true );
                     return;
                 } else {
@@ -299,13 +303,13 @@ public class MainActivity extends Activity
     }
 
     @Override
-    public void onRoomJoined(String room_name) {
+    public void onRoomJoined(String roomName) {
         setInCall( true );
-conference.getMembers( room_name );
+        conference.getMembers( roomName );
     }
 
     @Override
-    public void onRoomQuitted(String room_name) {
+    public void onRoomQuitted(String roomName) {
         setInCall( false );
     }
 
@@ -353,12 +357,12 @@ conference.getMembers( room_name );
 
         @Override
         public void onClose(DataStream myself) {
-    Log.d( TAG+" DataStream.Handler", "onClose" );
+            Log.d( TAG+" DataStream.Handler", "onClose" );
         }
 
         @Override
         public void onError(DataStream myself, String error) {
-    Log.d( TAG+" DataStream.Handler", "onError : " + error );
+            Log.d( TAG+" DataStream.Handler", "onError : " + error );
         }
     });
     }
@@ -373,10 +377,10 @@ conference.getMembers( room_name );
 
     @Override
     public void onRoomMembers(String roomName, ArrayList<Member> members) {
-for (int i = 0; i < members.size(); i++) {
-    Member member =  members.get(i);
-    Log.v( TAG, "member id:" + member.id() + " name:" + member.name() );
-}
+        for (int i = 0; i < members.size(); i++) {
+            Member member =  members.get(i);
+            Log.v( TAG, "member id:" + member.id() + " name:" + member.name() );
+        }
     }
 
     @Override
@@ -386,12 +390,13 @@ for (int i = 0; i < members.size(); i++) {
 
         orientation_landscape = (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE);
         room_layout.setOrientation(orientation_landscape ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+        call_layout.onOrientationChange();
     }
 
     public void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager)getSystemService(
                 Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(room_name.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(room_edit.getWindowToken(), 0);
     }
 
 }

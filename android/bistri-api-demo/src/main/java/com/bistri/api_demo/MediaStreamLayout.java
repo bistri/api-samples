@@ -1,23 +1,95 @@
 package com.bistri.api_demo;
 
 import android.content.Context;
-import android.content.res.Configuration;
+import android.graphics.Color;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.bistri.api.MediaStream;
 
 import java.util.ArrayList;
 
-public class MediaStreamLayout extends RelativeLayout implements View.OnClickListener,MediaStream.Handler{
+public class MediaStreamLayout extends RelativeLayout implements MediaStream.Handler{
     private static final String TAG = "MediaStreamLayout";
-    private ArrayList<MediaStream> mediaStreams;
-    private boolean process_layout;
-    private int last_video_nb = 0;
-    int last_orientation = Configuration.ORIENTATION_UNDEFINED;
+
+    private ArrayList<VideoView> views;
+
+    private int lastWidth = 0;
+    private int lastHeight = 0;
+
+    private class VideoView extends FrameLayout implements View.OnClickListener {
+        public TextView videoInfo;
+        public SurfaceView renderView;
+        public MediaStream mediaStream;
+
+        private int muteState;
+        private boolean local;
+
+        public VideoView(Context context, MediaStream mediaStream) {
+            super(context);
+            muteState = 0;
+            this.mediaStream = mediaStream;
+            local = mediaStream.getPeerId().equals("local");
+            renderView = mediaStream.getRender();
+            videoInfo = new TextView( context );
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT,  FrameLayout.LayoutParams.MATCH_PARENT );
+            renderView.setLayoutParams( params );
+
+            params = new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT,  FrameLayout.LayoutParams.MATCH_PARENT);
+            videoInfo.setLayoutParams( params );
+            videoInfo.setTextColor(Color.RED );
+            videoInfo.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14.f);
+
+            this.addView( renderView );
+            this.addView( videoInfo );
+
+            setOnClickListener( this );
+        }
+
+        public void onRemove() {
+            this.removeAllViews();
+        }
+
+        @Override
+        public void onClick(View view) {
+            Log.d(TAG, ( !mediaStream.isAudioMute() ? "Mute" : "Unmute" ) + " peer " + mediaStream.getPeerId() );
+            muteState = (muteState+1)>3 ? 0 : muteState+1;
+
+            String info = "";
+            switch( muteState ) {
+                case 0:
+                    mediaStream.muteAudio( false );
+                    mediaStream.muteVideo( false );
+                    break;
+                case 1:
+                    info = ( local ? "Microphone" : "Audio" ) + " muted";
+                    mediaStream.muteAudio( true );
+                    mediaStream.muteVideo(false);
+                    break;
+                case 2:
+                    info = ( local ? "Microphone" : "Audio" ) + " muted";
+                    info += "\n" +( local ? "Camera" : "Video" ) + " muted";
+                    mediaStream.muteAudio( true );
+                    mediaStream.muteVideo( true );
+                    break;
+                case 3:
+                    info = ( local ? "Camera" : "Video" ) + " muted";
+                    mediaStream.muteAudio( false );
+                    mediaStream.muteVideo( true );
+                    break;
+            }
+
+            videoInfo.setText( info );
+        }
+    }
 
     public MediaStreamLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -26,22 +98,30 @@ public class MediaStreamLayout extends RelativeLayout implements View.OnClickLis
     }
 
     private void init() {
-        mediaStreams = new ArrayList<MediaStream>();
+        views = new ArrayList<VideoView>();
     }
 
     public void removeMediaStream(MediaStream mediaStream) {
         mediaStream.setHandler( null );
-        this.removeView( mediaStream.getRender() );
-        mediaStreams.remove( mediaStream );
+
+        for (VideoView vv : views) {
+            if ( vv.mediaStream == mediaStream ) {
+                this.removeView(vv);
+                vv.onRemove();
+                views.remove(vv);
+                break;
+            }
+        }
 
         resizeAllVideo();
     }
 
     public void removeAllMediaStream() {
-        for ( MediaStream mediaStream : mediaStreams ) {
-            mediaStream.setHandler( null );
+        for ( VideoView videoView : views ) {
+            videoView.mediaStream.setHandler( null );
+            videoView.onRemove();
         }
-        mediaStreams.clear();
+        views.clear();
         this.removeAllViews();
     }
 
@@ -50,11 +130,11 @@ public class MediaStreamLayout extends RelativeLayout implements View.OnClickLis
             Log.w( TAG, "No video for mediaStream of " + mediaStream.getPeerId() );
             return;
         }
-        mediaStreams.add( mediaStream );
-        View render_view = mediaStream.getRender();
-        this.addView( render_view );
+        VideoView vv = new VideoView( getContext(), mediaStream );
+        views.add( vv );
+
+        this.addView( vv );
         mediaStream.setHandler( this );
-        render_view.setOnClickListener(this);
 
         resizeAllVideo();
     }
@@ -64,54 +144,10 @@ public class MediaStreamLayout extends RelativeLayout implements View.OnClickLis
         resizeAllVideo();
     }
 
-    @Override
-    public void requestLayout() {
-        if ( process_layout ) return;
-        process_layout = true;
-
-        super.requestLayout();
-
-        process_layout = false;
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout( changed, left, top, right, bottom );
-
-        resizeAllVideo();
-    }
-
-    public void resize() {
-        requestLayout();
-    }
-
-    // Check if we need to resize video
-    private boolean needResize() {
-        int current_orientation = this.getResources().getConfiguration().orientation;
-        if ( last_orientation != current_orientation ) {
-            return true;
-        }
-        if ( last_video_nb != mediaStreams.size() ) {
-            return true;
-        }
-        for (MediaStream media : mediaStreams) {
-            float ratio = media.getVideoRatio();
-            SurfaceView view = media.getRender();
-            float current_ratio = (float)view.getWidth() / view.getHeight();
-            if ( (int)(ratio *100) != (int)(current_ratio *100) ) {
-                return true;
-            }
-        }
-        return false;
-    }
     private synchronized void resizeAllVideo() {
-        if ( !needResize() ) {
-            return;
-        }
-
         int width = this.getWidth();
         int height = this.getHeight();
-        int cpt = 0, nbView = mediaStreams.size();
+        int cpt = 0, nbView = views.size();
 
         if (nbView == 0)
             return;
@@ -122,10 +158,9 @@ public class MediaStreamLayout extends RelativeLayout implements View.OnClickLis
         int maxViewWidth = width / nbCol;
         int maxViewHeight = height / nbLine;
 
-        for (MediaStream media : mediaStreams) {
+        for (VideoView vv : views) {
 
-            float ratio = media.getVideoRatio();
-            SurfaceView view = media.getRender();
+            float ratio = vv.mediaStream.getVideoRatio();
 
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             int viewWidth = maxViewWidth;
@@ -166,23 +201,28 @@ public class MediaStreamLayout extends RelativeLayout implements View.OnClickLis
             }
 
             params.setMargins(left, top, right, bottom);
-            view.setLayoutParams(params);
+            vv.setLayoutParams(params);
             cpt++;
         }
-        last_video_nb = mediaStreams.size();
+
+        lastWidth = getWidth();
+        lastHeight = getHeight();
     }
 
-    @Override
-    public void onClick(View view) {
-
-        // Mute audio on render click
-        for (MediaStream media : mediaStreams) {
-            View render_view = media.getRender();
-            if (view == render_view) {
-                Log.d(TAG, ( !media.isAudioMute() ? "Mute" : "Unmute" ) + " peer " +media.getPeerId() );
-                media.muteAudio(!media.isAudioMute());
-                break;
+    public void onOrientationChange() {
+        ViewTreeObserver observer = getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (lastWidth != getWidth() || lastHeight != getHeight()) {
+                    if (Build.VERSION.SDK_INT < 16) {
+                        getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    } else {
+                        getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    }
+                    resizeAllVideo();
+                }
             }
-        }
+        });
     }
 }

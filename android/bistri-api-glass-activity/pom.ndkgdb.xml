@@ -5,7 +5,7 @@
 
   <groupId>com.bistri.api</groupId>
   <artifactId>bistri-api-glass-activity</artifactId>
-  <version>1.1.1</version>
+  <version>1.2</version>
   <packaging>apk</packaging>
 
   <name>Bistri android WebRTC - API demo</name>
