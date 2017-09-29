@@ -42,7 +42,7 @@ onBistriConferenceReady = function () {
 		 // then, for every single members already present in the room ...
 		for ( var i=0, max=roomMembers.length; i<max; i++ ) {
 			// ... request a call
-			bc.call( roomMembers[i].id, "conference_demo", { stream: localStream } );
+			bc.call( roomMembers[i].id, "conference_demo", { stream: localStream, 'video-codec': 'H264/9000' } );
 		}
 	});
 
